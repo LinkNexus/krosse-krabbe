@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Krosse Krabbe</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>Krosse Krabbe</h1>
+        <h2 id="activeMode">Active Mode: Manual</h2>
+    </header>
+
+    <main>
+
+        <div class="movement">
+
+            <button class="move" id="forward"
+                onpointerdown="startForward()"
+                onpointerup="stopAction()"
+                onpointerleave="stopAction()">
+                ▲
+            </button>
+            
+            <div class="middleRow">  
+                <button class="move" id="rotateLeft"
+                    onpointerdown="startRotateLeft()"
+                    onpointerup="stopAction()"
+                    onpointerleave="stopAction()">
+                    ◄
+                </button>
+
+                <button class="move" id="rotateRight"
+                    onpointerdown="startRotateRight()"
+                    onpointerup="stopAction()"
+                    onpointerleave="stopAction()">
+                    ►
+                </button>
+            </div>
+    
+            <button class="move" id="backward"
+                onpointerdown="startBackward()"
+                onpointerup="stopAction()"
+                onpointerleave="stopAction()">
+                ▼
+            </button>
+    
+        </div>
+
+        <div class="modes">
+            <button class="mode" id="dance"
+                onclick="activateDanceMode()">
+                Tanzmodus
+            </button>
+
+            <button class="mode" id="tracking"
+                onclick="activateTrackingMode()">
+                Verfolgungsmodus
+            </button>
+        </div>
+    </main>
+</body>
+</html>
+
+<script>
+let intervalId = null;
+
+function sendCommand(command)
+{
+    fetch("/command", {
+        method: "POST",
+        body: command
+    });
+}
+
+function startForward()
+{
+    if(intervalId !== null)
+        return;
+
+    sendCommand("Forward");
+
+    intervalId = setInterval(() =>
+    {
+        sendCommand("Forward");
+    }, 100);
+}
+
+function startBackward()
+{
+    if(intervalId !== null)
+        return;
+
+    sendCommand("Backward");
+
+    intervalId = setInterval(() =>
+    {
+        sendCommand("Backward");
+    }, 100);
+}
+
+function startRotateLeft()
+{
+    if(intervalId !== null)
+        return;
+
+    sendCommand("RotateLeft");
+
+    intervalId = setInterval(() =>
+    {
+        sendCommand("RotateLeft");
+    }, 100);
+}
+
+function startRotateRight()
+{
+    if(intervalId !== null)
+        return;
+
+    sendCommand("RotateRight");
+
+    intervalId = setInterval(() =>
+    {
+        sendCommand("RotateRight");
+    }, 100);
+}
+
+function activateDanceMode()
+{
+    sendCommand("DanceMode");
+}
+
+function activateTrackingMode()
+{
+    sendCommand("TrackingMode");
+}
+
+function stopAction()
+{
+    if(intervalId === null)
+        return;
+
+    clearInterval(intervalId);
+    intervalId = null;
+
+    sendCommand("None");
+}
+
+async function updateStatus()
+{
+    const response = await fetch("/status");
+    const mode = await response.text();
+
+    document.getElementById("activeMode").textContent = "Active Mode: " + mode;
+}
+setInterval(updateStatus, 500);
+
+</script>

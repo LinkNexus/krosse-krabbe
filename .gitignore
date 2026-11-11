@@ -1,0 +1,7 @@
+.pio
+.cache
+compile_commands.json
+motor_i2c
+crabbyProgram
+danceControllerTests
+test_images
